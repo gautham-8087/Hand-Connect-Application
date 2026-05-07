@@ -380,10 +380,12 @@
         <div class="panel">
             <div class="stat">Hands: <span class="val" id="ui-hands">0</span></div>
             <div class="stat">Performance: <span class="val" id="ui-fps">0</span></div>
+            <div class="stat">Velocity: <span class="val" id="ui-velocity">0.0</span></div>
         </div>
         <div class="panel">
             <div class="stat">Gesture: <span class="val" id="ui-gesture">None</span></div>
             <div class="stat">Hand Spread: <span class="val" id="ui-spread">0%</span></div>
+            <div class="stat">Distance: <span class="val" id="ui-distance">N/A</span></div>
         </div>
     </div>
 
@@ -446,6 +448,8 @@ const uiHands = document.getElementById('ui-hands');
 const uiFps = document.getElementById('ui-fps');
 const uiGesture = document.getElementById('ui-gesture');
 const uiSpread = document.getElementById('ui-spread');
+const uiVelocity = document.getElementById('ui-velocity');
+const uiDistance = document.getElementById('ui-distance');
 
 /**
  * INITIALIZATION
@@ -567,6 +571,19 @@ let lastPinchState = [false, false]; // Prevents rapid re-triggering
 
 function detectGestures() {
     if (!currentHands.length) return;
+    
+    // Update velocity display
+    uiVelocity.innerText = handVelocities.toFixed(2);
+    
+    // Calculate distance between hands if 2 hands detected
+    if (currentHands.length >= 2) {
+        const p1 = currentHands[0][8]; // Index finger of hand 1
+        const p2 = currentHands[1][8]; // Index finger of hand 2
+        const dist = getDist(p1, p2);
+        uiDistance.innerText = Math.round(dist * 100) + 'cm';
+    } else {
+        uiDistance.innerText = 'N/A';
+    }
     
     currentHands.forEach((hand, idx) => {
         // Pinch Detection: Thumb (4) and Index (8)
